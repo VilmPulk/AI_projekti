@@ -14,7 +14,7 @@ canvas {
     right: 8px;
 }
 
-.game-over-screen {
+.game-screen {
     position: absolute;
     inset: 0;
     display: flex;
@@ -26,11 +26,11 @@ canvas {
     color: white;
 }
 
-.game-over-screen[hidden] {
+.game-screen[hidden] {
     display: none;
 }
 
-.game-over-screen h2,
-.game-over-screen p {
+.game-screen h2,
+.game-screen p {
     margin: 0;
 }
