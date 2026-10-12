@@ -33,6 +33,7 @@
         let direction = { x: 1, y: 0 };
         let food = { x: 15, y: 15 };
         let score = 0;
+        let gameInterval;
 
         // ===== DRAWING =====
         const drawGame = () => {
@@ -58,11 +59,31 @@
 
         drawGame();
 
-    moveSnake = () => {
+        const moveSnake = () => {
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            const eatingFood = head.x === food.x && head.y === food.y;
+
+            if (
+                head.x < 0 || head.x >= tileCount ||
+                head.y < 0 || head.y >= tileCount
+            ) {
+                document.getElementById("info").textContent =
+                    `Game over! Final score: ${score}`;
+                clearInterval(gameInterval);
+                return;
+            }
+
+            const bodyToCheck = snake.slice(0, eatingFood ? snake.length : -1);
+            if (bodyToCheck.some(segment => segment.x === head.x && segment.y === head.y)) {
+                document.getElementById("info").textContent =
+                    `Game over! Final score: ${score}`;
+                clearInterval(gameInterval);
+                return;
+            }
+
             snake.unshift(head);
 
-            if (head.x === food.x && head.y === food.y) {
+            if (eatingFood) {
                 score++;
                 document.getElementById("info").textContent = `Score: ${score}`;
                 placeFood();
@@ -81,7 +102,7 @@
             drawGame();
         };
 
-        setInterval(gameLoop, 100);
+        gameInterval = setInterval(gameLoop, 100);
 
         document.addEventListener("keydown", (event) => {
             switch (event.key) {
@@ -104,4 +125,3 @@
 
 </body>
 </html>
-
