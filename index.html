@@ -21,7 +21,7 @@
             <button id="resumeButton" type="button">Resume</button>
         </div>
         <div id="gameOverScreen" class="game-screen" hidden>
-            <h2 id="gameOverTitle">Game over!</h2>
+            <h2 id="gameOverTitle">Game over</h2>
             <p id="finalScore"></p>
             <button id="replayButton" type="button">Replay</button>
         </div>
@@ -32,19 +32,34 @@
         // ===== GAME SETUP =====
         const canvas =
             document.getElementById("gameCanvas");
+
         const ctx = canvas.getContext("2d");
+
         const gridSize = 20;
+
         const tileCount = canvas.width / gridSize;
+
         const info = document.getElementById("info");
+
+        //Buttons
+
         const replayButton = document.getElementById("replayButton");
         const pauseButton = document.getElementById("pauseButton");
         const startButton = document.getElementById("startButton");
         const resumeButton = document.getElementById("resumeButton");
+
+        //Screens
+
         const startScreen = document.getElementById("startScreen");
         const pauseScreen = document.getElementById("pauseScreen");
         const gameOverScreen = document.getElementById("gameOverScreen");
+       
         const gameOverTitle = document.getElementById("gameOverTitle");
+
         const finalScore = document.getElementById("finalScore");
+
+        //Speed
+
         const startingSpeed = 250;
         const minimumSpeed = 80;
         const speedIncrease = 15;
@@ -65,6 +80,8 @@
         let isGameOver = false;
 
         // ===== DRAWING =====
+
+        //Background
         const drawGame = () => {
             ctx.clearRect(0, 0,
                 canvas.width, canvas.height);
@@ -80,12 +97,17 @@
                 }
             }
 
+            //Food
+
             ctx.fillStyle = "red";
             ctx.fillRect(
                 food.x * gridSize,
                 food.y * gridSize,
                 gridSize, gridSize
             );
+
+
+            //Snake
 
             ctx.fillStyle = "#4b2e1f";
             for (const segment of snake.slice(1)) {
@@ -106,6 +128,9 @@
             ctx.fillStyle = "#4b2e1f";
             ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
 
+
+            // eyes 
+
             for (const side of [-1, 1]) {
                 const eyeX = centerX + forwardX + sideX * side;
                 const eyeY = centerY + forwardY + sideY * side;
@@ -113,23 +138,14 @@
                 ctx.arc(eyeX, eyeY, 3, 0, Math.PI * 2);
                 ctx.fillStyle = "white";
                 ctx.fill();
-
-                ctx.beginPath();
-                ctx.arc(
-                    eyeX + direction.x * 1.5,
-                    eyeY + direction.y * 1.5,
-                    1.5,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fillStyle = "black";
-                ctx.fill();
             }
         };
 
         drawGame();
 
-        const endGame = (message = "Game over!") => {
+        // Ending game and final score
+
+        const endGame = (message = "Game over") => {
             isGameOver = true;
             isPaused = false;
             pauseButton.disabled = true;
@@ -141,10 +157,14 @@
             clearInterval(gameInterval);
         };
 
+        // Runs the game loop
+
         const startGameLoop = () => {
             clearInterval(gameInterval);
             gameInterval = setInterval(gameLoop, gameSpeed);
         };
+
+        // Hiding the start screen and replay
 
         const startGame = () => {
             isStarted = true;
@@ -153,6 +173,8 @@
             startGameLoop();
         };
 
+        // Hides the pause screen and then continue
+
         const resumeGame = () => {
             isPaused = false;
             pauseScreen.hidden = true;
@@ -160,6 +182,8 @@
             pauseButton.setAttribute("aria-pressed", "false");
             startGameLoop();
         };
+
+        // Moves the snake and checks if the snake eats or hit a wall or itself
 
         const moveSnake = () => {
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
@@ -195,6 +219,8 @@
             }
         };
 
+        // Checking that the food goes to an empty tile
+
         const placeFood = () => {
             const emptyTiles = [];
             for (let row = 0; row < tileCount; row++) {
@@ -211,12 +237,18 @@
             return true;
         };
 
+        // Game loop
+
         const gameLoop = () => {
             moveSnake();
             drawGame();
         };
 
+        // Startbutton action
+
         startButton.addEventListener("click", startGame);
+
+        // Replay button action
 
         replayButton.addEventListener("click", () => {
             clearInterval(gameInterval);
@@ -242,7 +274,11 @@
             startGameLoop();
         });
 
+        // Resume button action
+
         resumeButton.addEventListener("click", resumeGame);
+
+        // Pausebutton action
 
         pauseButton.addEventListener("click", () => {
             if (!isStarted || isGameOver) return;
@@ -259,6 +295,8 @@
             }
         });
 
+        // Arrowkeys action
+        
         document.addEventListener("keydown", (event) => {
             if (!isStarted || isPaused || isGameOver) return;
 
