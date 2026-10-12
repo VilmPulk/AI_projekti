@@ -88,12 +88,42 @@
             );
 
             ctx.fillStyle = "#4b2e1f";
-            for (const segment of snake) {
+            for (const segment of snake.slice(1)) {
                 ctx.fillRect(
                     segment.x * gridSize,
                     segment.y * gridSize,
                     gridSize, gridSize
                 );
+            }
+
+            const head = snake[0];
+            const centerX = head.x * gridSize + gridSize / 2;
+            const centerY = head.y * gridSize + gridSize / 2;
+            const forwardX = direction.x * 4;
+            const forwardY = direction.y * 4;
+            const sideX = -direction.y * 4.5;
+            const sideY = direction.x * 4.5;
+            ctx.fillStyle = "#4b2e1f";
+            ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+
+            for (const side of [-1, 1]) {
+                const eyeX = centerX + forwardX + sideX * side;
+                const eyeY = centerY + forwardY + sideY * side;
+                ctx.beginPath();
+                ctx.arc(eyeX, eyeY, 3, 0, Math.PI * 2);
+                ctx.fillStyle = "white";
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(
+                    eyeX + direction.x * 1.5,
+                    eyeY + direction.y * 1.5,
+                    1.5,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fillStyle = "black";
+                ctx.fill();
             }
         };
 
