@@ -15,6 +15,7 @@
     <h1>Snake</h1>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <p id="info"></p>
+    <button id="replayButton" type="button" hidden>Replay</button>
 
     <script>
         // ===== GAME SETUP =====
@@ -23,6 +24,8 @@
         const ctx = canvas.getContext("2d");
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
+        const info = document.getElementById("info");
+        const replayButton = document.getElementById("replayButton");
 
         // ===== INITIAL STATE =====
         let snake = [
@@ -59,6 +62,12 @@
 
         drawGame();
 
+        const endGame = () => {
+            info.textContent = `Game over! Final score: ${score}`;
+            replayButton.hidden = false;
+            clearInterval(gameInterval);
+        };
+
         const moveSnake = () => {
             const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
             const eatingFood = head.x === food.x && head.y === food.y;
@@ -67,17 +76,13 @@
                 head.x < 0 || head.x >= tileCount ||
                 head.y < 0 || head.y >= tileCount
             ) {
-                document.getElementById("info").textContent =
-                    `Game over! Final score: ${score}`;
-                clearInterval(gameInterval);
+                endGame();
                 return;
             }
 
             const bodyToCheck = snake.slice(0, eatingFood ? snake.length : -1);
             if (bodyToCheck.some(segment => segment.x === head.x && segment.y === head.y)) {
-                document.getElementById("info").textContent =
-                    `Game over! Final score: ${score}`;
-                clearInterval(gameInterval);
+                endGame();
                 return;
             }
 
@@ -85,7 +90,7 @@
 
             if (eatingFood) {
                 score++;
-                document.getElementById("info").textContent = `Score: ${score}`;
+                info.textContent = `Score: ${score}`;
                 placeFood();
             } else {
                 snake.pop();
@@ -101,6 +106,22 @@
             moveSnake();
             drawGame();
         };
+
+        replayButton.addEventListener("click", () => {
+            clearInterval(gameInterval);
+            snake = [
+                { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+            direction = { x: 1, y: 0 };
+            food = { x: 15, y: 15 };
+            score = 0;
+            info.textContent = "";
+            replayButton.hidden = true;
+            drawGame();
+            gameInterval = setInterval(gameLoop, 100);
+        });
 
         gameInterval = setInterval(gameLoop, 100);
 
