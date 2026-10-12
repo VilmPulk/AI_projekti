@@ -9,9 +9,16 @@
 <body>
 
     <h1>Snake</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <button id="pauseButton" type="button" aria-pressed="false">Pause</button>
+        <div id="gameOverScreen" class="game-over-screen" hidden>
+            <h2>Game over!</h2>
+            <p id="finalScore"></p>
+            <button id="replayButton" type="button">Replay</button>
+        </div>
+    </div>
     <p id="info"></p>
-    <button id="replayButton" type="button" hidden>Replay</button>
 
     <script>
         // ===== GAME SETUP =====
@@ -22,6 +29,9 @@
         const tileCount = canvas.width / gridSize;
         const info = document.getElementById("info");
         const replayButton = document.getElementById("replayButton");
+        const pauseButton = document.getElementById("pauseButton");
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        const finalScore = document.getElementById("finalScore");
 
         // ===== INITIAL STATE =====
         let snake = [
@@ -33,11 +43,24 @@
         let food = { x: 15, y: 15 };
         let score = 0;
         let gameInterval;
+        let isPaused = false;
+        let isGameOver = false;
 
         // ===== DRAWING =====
         const drawGame = () => {
             ctx.clearRect(0, 0,
                 canvas.width, canvas.height);
+            for (let row = 0; row < tileCount; row++) {
+                for (let column = 0; column < tileCount; column++) {
+                    ctx.fillStyle = (row + column) % 2 === 0 ? "#aad751" : "#a2d149";
+                    ctx.fillRect(
+                        column * gridSize,
+                        row * gridSize,
+                        gridSize,
+                        gridSize
+                    );
+                }
+            }
 
             ctx.fillStyle = "red";
             ctx.fillRect(
@@ -46,7 +69,7 @@
                 gridSize, gridSize
             );
 
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "#4b2e1f";
             for (const segment of snake) {
                 ctx.fillRect(
                     segment.x * gridSize,
@@ -59,8 +82,13 @@
         drawGame();
 
         const endGame = () => {
-            info.textContent = `Game over! Final score: ${score}`;
-            replayButton.hidden = false;
+            isGameOver = true;
+            isPaused = false;
+            pauseButton.disabled = true;
+            pauseButton.textContent = "Pause";
+            pauseButton.setAttribute("aria-pressed", "false");
+            finalScore.textContent = `Final score: ${score}`;
+            gameOverScreen.hidden = false;
             clearInterval(gameInterval);
         };
 
@@ -105,6 +133,11 @@
 
         replayButton.addEventListener("click", () => {
             clearInterval(gameInterval);
+            isPaused = false;
+            isGameOver = false;
+            pauseButton.disabled = false;
+            pauseButton.textContent = "Pause";
+            pauseButton.setAttribute("aria-pressed", "false");
             snake = [
                 { x: 10, y: 10 },
                 { x: 9, y: 10 },
@@ -114,9 +147,23 @@
             food = { x: 15, y: 15 };
             score = 0;
             info.textContent = "";
-            replayButton.hidden = true;
+            gameOverScreen.hidden = true;
             drawGame();
             gameInterval = setInterval(gameLoop, 100);
+        });
+
+        pauseButton.addEventListener("click", () => {
+            if (isGameOver) return;
+
+            isPaused = !isPaused;
+            pauseButton.textContent = isPaused ? "Resume" : "Pause";
+            pauseButton.setAttribute("aria-pressed", String(isPaused));
+
+            if (isPaused) {
+                clearInterval(gameInterval);
+            } else {
+                gameInterval = setInterval(gameLoop, 100);
+            }
         });
 
         gameInterval = setInterval(gameLoop, 100);
